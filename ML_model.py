@@ -41,15 +41,24 @@ def load_images_from_folder(folder, label, img_size):
         if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp')):
             img_path = os.path.join(folder, filename)
             try:
-                with Image.open(img_path) as img:
-                    img = img.convert('L')               # grayscale
-                    img = img.resize((img_size, img_size))
-                    img_np = np.array(img, dtype=np.float32)
-                    images.append(img_np)
-                    labels.append(label)
+                img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+                if img is None:
+                    continue
+
+                img = cv2.resize(img, (img_size, img_size))
+
+                # --- EDGE DETECTION ---
+                img = cv2.GaussianBlur(img, (3, 3), 0)
+                edges = cv2.Canny(img, threshold1=50, threshold2=150)
+
+                images.append(edges.astype(np.float32))
+                labels.append(label)
+
             except Exception as e:
                 print(f"⚠️ Failed to load {img_path}: {e}")
+
     return images, labels
+
 
 def build_model(input_shape):
     # Small but effective CNN with BatchNorm and Dropout
