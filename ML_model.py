@@ -2,6 +2,7 @@ import os
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import cv2
 from PIL import Image
 from sklearn.model_selection import KFold
 from sklearn.metrics import confusion_matrix, classification_report, f1_score
